@@ -1,27 +1,49 @@
 # Offline Transcriber
 
-Local Python app that turns MP3 (and other audio) into `.txt` and `.srt` files using [faster-whisper](https://github.com/SYSTRAN/faster-whisper). After a one-time model download, it runs **fully offline** on this PC. No cloud APIs, no accounts, no telemetry.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/akgordon/Transcriber/actions/workflows/ci.yml/badge.svg)](https://github.com/akgordon/Transcriber/actions/workflows/ci.yml)
+
+Local Python app that turns MP3 (and other audio) into `.txt` and `.srt` files using [faster-whisper](https://github.com/SYSTRAN/faster-whisper). After a one-time model download, it runs **fully offline**. No cloud APIs, no accounts, no telemetry.
 
 Command line and a simple desktop window are both included.
 
 ## Requirements
 
-- Windows, with [Python 3.10+](https://www.python.org/downloads/) (3.11 or 3.12 recommended)
+- Python 3.10+ (3.11–3.13 recommended)
 - Disk space for a model (`small` is a few hundred MB; `large-v3` is a few GB)
 - Optional: NVIDIA GPU + CUDA for faster / larger models
 
+Works on Windows, macOS, and Linux.
+
 ## One-time setup (internet)
 
-From the project folder:
+```bash
+git clone https://github.com/akgordon/Transcriber.git
+cd Transcriber
+python -m venv .venv
+```
+
+Activate the virtual environment:
+
+- Windows (PowerShell): `.\.venv\Scripts\Activate.ps1`
+- Windows (cmd): `.venv\Scripts\activate.bat`
+- macOS / Linux: `source .venv/bin/activate`
+
+If PowerShell blocks the activate script:
 
 ```powershell
-python -m venv .venv
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\.venv\Scripts\Activate.ps1
+```
+
+Then:
+
+```bash
 pip install -r requirements.txt
 python -m transcriber download small
 ```
 
-That stores weights in `models\small\`. Repeat `download` with another size if you want a second model.
+That stores weights in `models/small/`. Repeat `download` with another size if you want a second model.
 
 After this, you can disconnect from the network. Transcription never contacts Hugging Face or any other service.
 
@@ -29,16 +51,16 @@ After this, you can disconnect from the network. Transcription never contacts Hu
 
 Desktop window:
 
-```powershell
+```bash
 python -m transcriber --gui
 ```
 
 Command line:
 
-```powershell
-python -m transcriber path\to\audio.mp3
-python -m transcriber path\to\audio.mp3 --model small --language en
-python -m transcriber path\to\folder --model small
+```bash
+python -m transcriber path/to/audio.mp3
+python -m transcriber path/to/audio.mp3 --model small --language en
+python -m transcriber path/to/folder --model small
 python -m transcriber download small
 ```
 
@@ -62,19 +84,26 @@ On CPU, start with `small`. Use `large-v3` or `turbo` if you have an NVIDIA GPU.
 
 ## Offline rules
 
-- Models load from `models\<name>\` with `local_files_only=True`.
+- Models load from `models/<name>/` with `local_files_only=True`.
 - If a model is missing, the app tells you to run `python -m transcriber download <name>` instead of downloading during transcription.
 - Silero VAD (silence skipping) is bundled with faster-whisper; it does not need a network.
 
-## Licenses
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Please report security issues as described in [SECURITY.md](SECURITY.md).
+
+## License
+
+This project is licensed under the [MIT License](LICENSE). Copyright (c) 2026 Alan Gordon.
+
+Third-party components:
 
 | Piece | License |
 | --- | --- |
-| This app | For your local use; keep it as you like |
 | [faster-whisper](https://github.com/SYSTRAN/faster-whisper) | MIT |
 | [CTranslate2](https://github.com/OpenNMT/CTranslate2) | MIT |
 | [OpenAI Whisper](https://github.com/openai/whisper) weights | MIT |
 | [Silero VAD](https://github.com/snakers4/silero-vad) | MIT |
-| FFmpeg / PyAV (MP3 decode) | Typically LGPL |
+| FFmpeg / PyAV (MP3 decode, installed via pip) | Typically LGPL |
 
-All of the above are free to use locally. This project does **not** call the paid OpenAI transcription API.
+This project does **not** call the paid OpenAI transcription API. Model weights are not shipped in the repository; each user downloads them locally.
